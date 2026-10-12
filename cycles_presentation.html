@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Biogeochemical Cycles: Carbon, Nitrogen & Oxygen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f141c;
+      --bg-board: #161e2b;
+      --board-border: #2a374d;
+      --chalk-white: #f1f5f9;
+      --chalk-muted: #94a3b8;
+      --chalk-yellow: #fcd34d;
+      --chalk-green: #4ade80;
+      --chalk-cyan: #38bdf8;
+      --chalk-amber: #fb923c;
+      --chalk-pink: #f472b6;
+      --card-bg: rgba(22, 30, 43, 0.88);
+      --card-border: rgba(148, 163, 184, 0.2);
+      --font-hand: 'Architects Daughter', cursive, sans-serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--bg-dark);
+      color: var(--chalk-white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient chalkboard background */
+    .board-frame {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 30%, #1a2536 0%, #111722 85%, #0d121b 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .doodle-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.12;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+      background-size: 32px 32px;
+      z-index: 1;
+    }
+
+    /* Top Progress Bar */
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      z-index: 300;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 11.1%;
+      background: linear-gradient(90deg, var(--chalk-green), var(--chalk-cyan), var(--chalk-yellow));
+      transition: width 0.3s ease;
+    }
+
+    /* Sticky Header */
+    .deck-header {
+      position: sticky;
+      top: 0;
+      z-index: 250;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 20px;
+      background: rgba(15, 20, 28, 0.96);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .deck-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-hand);
+      font-size: 1.15rem;
+      color: var(--chalk-yellow);
+    }
+
+    .deck-badge svg {
+      stroke: var(--chalk-yellow);
+      fill: none;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Mode Switcher Pill */
+    .mode-toggle-pill {
+      background: rgba(252, 211, 77, 0.12);
+      border: 1px solid var(--chalk-yellow);
+      color: var(--chalk-yellow);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: var(--font-body);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      touch-action: manipulation;
+      transition: all 0.2s ease;
+    }
+
+    .mode-toggle-pill:hover {
+      background: rgba(252, 211, 77, 0.25);
+    }
+
+    .slide-counter {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      color: var(--chalk-muted);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      white-space: nowrap;
+    }
+
+    /* Numbered Slide Jump Bar */
+    .jump-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .jump-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .jump-label {
+      font-size: 0.78rem;
+      color: var(--chalk-muted);
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .jump-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-family: var(--font-code);
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .jump-btn:hover, .jump-btn.active {
+      background: rgba(252, 211, 77, 0.2);
+      border-color: var(--chalk-yellow);
+      color: var(--chalk-yellow);
+    }
+
+    /* Main Slides Viewport */
+    .viewport {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Slide Deck Card */
+    .slide {
+      background: rgba(22, 30, 43, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 18px;
+      padding: 32px;
+      flex-direction: column;
+      gap: 20px;
+      scroll-margin-top: 110px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Mode 1: Slide Show Mode (Default) */
+    body:not(.view-scroll-mode) .slide {
+      display: none;
+      animation: fadeInSlide 0.25s ease forwards;
+    }
+
+    body:not(.view-scroll-mode) .slide.active {
+      display: flex;
+    }
+
+    /* Mode 2: Scroll Feed Mode */
+    body.view-scroll-mode .slide {
+      display: flex !important;
+      margin-bottom: 24px;
+    }
+
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Normal Cased Badges and Titles (No All-Caps) */
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .tag-title { background: rgba(252, 211, 77, 0.12); color: var(--chalk-yellow); border: 1px dashed var(--chalk-yellow); }
+    .tag-carbon { background: rgba(74, 222, 128, 0.12); color: var(--chalk-green); border: 1px dashed var(--chalk-green); }
+    .tag-nitrogen { background: rgba(56, 189, 248, 0.12); color: var(--chalk-cyan); border: 1px dashed var(--chalk-cyan); }
+    .tag-oxygen { background: rgba(251, 146, 60, 0.12); color: var(--chalk-amber); border: 1px dashed var(--chalk-amber); }
+    .tag-nexus { background: rgba(244, 114, 182, 0.12); color: var(--chalk-pink); border: 1px dashed var(--chalk-pink); }
+
+    .slide-title {
+      font-family: var(--font-hand);
+      font-size: 2.5rem;
+      font-weight: 400;
+      line-height: 1.2;
+      color: #ffffff;
+      margin-top: 4px;
+    }
+
+    .slide-subtitle {
+      font-size: 1rem;
+      color: var(--chalk-muted);
+      line-height: 1.55;
+      max-width: 900px;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 1.25rem;
+    }
+
+    .card-title {
+      font-family: var(--font-hand);
+      font-size: 1.45rem;
+      margin-bottom: 8px;
+      color: var(--chalk-white);
+    }
+
+    .card-desc {
+      font-size: 0.92rem;
+      color: var(--chalk-muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .chem-formula {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      color: var(--chalk-yellow);
+      display: inline-block;
+      word-break: break-all;
+    }
+
+    /* Flow Steps (Nitrogen) */
+    .flow-pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .flow-step {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flow-num {
+      font-family: var(--font-hand);
+      font-size: 1.6rem;
+      color: var(--chalk-cyan);
+      margin-bottom: 4px;
+    }
+
+    .flow-step h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .flow-step p {
+      font-size: 0.82rem;
+      color: var(--chalk-muted);
+      line-height: 1.45;
+    }
+
+    /* Split Box */
+    .split-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .split-col {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .split-col.accent-green { border-top: 4px solid var(--chalk-green); }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .bullet-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #cbd5e1;
+    }
+
+    .bullet-list li::before {
+      content: "✦";
+      color: var(--chalk-yellow);
+      font-size: 0.85rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Title Hero */
+    .title-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px 10px 10px;
+    }
+
+    .title-hero {
+      font-family: var(--font-hand);
+      font-size: 3.6rem;
+      line-height: 1.1;
+      margin: 12px 0 16px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--chalk-yellow) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .element-pills {
+      display: flex;
+      gap: 14px;
+      margin: 20px 0 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .element-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50px;
+      padding: 8px 20px;
+    }
+
+    .pill-symbol {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .sym-c { background: rgba(74, 222, 128, 0.2); color: var(--chalk-green); border: 1px solid var(--chalk-green); }
+    .sym-n { background: rgba(56, 189, 248, 0.2); color: var(--chalk-cyan); border: 1px solid var(--chalk-cyan); }
+    .sym-o { background: rgba(251, 146, 60, 0.2); color: var(--chalk-amber); border: 1px solid var(--chalk-amber); }
+
+    .takeaway-card {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .takeaway-num {
+      font-family: var(--font-hand);
+      font-size: 1.4rem;
+      color: var(--chalk-yellow);
+      margin-bottom: 4px;
+    }
+
+    /* DIRECT IN-SLIDE BUTTONS (Works seamlessly on iPad, mobile, and desktop) */
+    .slide-direct-nav {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .slide-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: var(--font-body);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: all 0.2s ease;
+      min-height: 48px;
+    }
+
+    .slide-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .slide-nav-btn:active {
+      transform: scale(0.97);
+    }
+
+    .slide-nav-btn.next-accent {
+      background: rgba(74, 222, 128, 0.22);
+      border: 1.5px solid var(--chalk-green);
+      color: #ffffff;
+      margin-left: auto;
+      box-shadow: 0 0 16px rgba(74, 222, 128, 0.16);
+    }
+
+    .slide-nav-btn.next-accent:hover {
+      background: rgba(74, 222, 128, 0.35);
+    }
+
+    /* Responsive Adjustments for Mobile & Tablets */
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: 1fr; }
+      .flow-pipeline { grid-template-columns: 1fr; }
+      .grid-2, .split-box { grid-template-columns: 1fr; }
+      .slide-title { font-size: 2rem; }
+      .title-hero { font-size: 2.3rem; }
+      .slide { padding: 20px 16px; }
+      .element-pills { flex-direction: column; width: 100%; }
+      .element-pill { width: 100%; }
+      .slide-direct-nav { flex-direction: column-reverse; }
+      .slide-nav-btn { width: 100%; justify-content: center; }
+      .slide-nav-btn.next-accent { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Progress Bar -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="board-frame">
+    <div class="doodle-bg"></div>
+
+    <!-- Header -->
+    <header class="deck-header">
+      <div class="header-top">
+        <div class="deck-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3a9 9 0 0 1 9 9M12 7a5 5 0 0 1 5 5"/>
+          </svg>
+          <span>AP Environmental & Chemistry</span>
+        </div>
+
+        <div class="header-controls">
+          <button id="modeToggleBtn" class="mode-toggle-pill" onclick="toggleViewMode()" title="Switch between Slideshow mode and Scroll View">
+            <span id="modeIcon">📜</span>
+            <span id="modeText">Scroll View</span>
+          </button>
+          <div class="slide-counter" id="slideCounter">Slide 1 of 9</div>
+        </div>
+      </div>
+
+      <!-- Jump Bar -->
+      <div class="jump-bar" id="jumpBar">
+        <span class="jump-label">Slide:</span>
+        <button class="jump-btn active" onclick="goToSlide(1)">1. Intro</button>
+        <button class="jump-btn" onclick="goToSlide(2)">2. Principles</button>
+        <button class="jump-btn" onclick="goToSlide(3)">3. Carbon</button>
+        <button class="jump-btn" onclick="goToSlide(4)">4. Nitrogen</button>
+        <button class="jump-btn" onclick="goToSlide(5)">5. Oxygen</button>
+        <button class="jump-btn" onclick="goToSlide(6)">6. Nexus</button>
+        <button class="jump-btn" onclick="goToSlide(7)">7. Impact</button>
+        <button class="jump-btn" onclick="goToSlide(8)">8. Summary</button>
+        <button class="jump-btn" onclick="goToSlide(9)">9. Credits</button>
+      </div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main class="viewport" id="viewport">
+
+      <!-- SLIDE 1: Title -->
+      <section class="slide active" id="slide-1" data-slide="1">
+        <div class="title-wrapper">
+          <div class="slide-tag tag-title">Earth's Biochemical Mechanics</div>
+          <h1 class="title-hero">Carbon, Nitrogen & Oxygen Cycles</h1>
+          <p class="slide-subtitle">
+            How three fundamental elements choreograph Earth's biosphere, atmosphere, and oceans in a continuous closed loop of life and chemistry.
+          </p>
+
+          <div class="element-pills">
+            <div class="element-pill">
+              <div class="pill-symbol sym-c">C</div>
+              <div>
+                <strong style="color:var(--chalk-green);">Carbon</strong>
+                <div style="font-size:0.75rem; color:var(--chalk-muted);">The Molecular Backbone</div>
+              </div>
+            </div>
+            <div class="element-pill">
+              <div class="pill-symbol sym-n">N</div>
+              <div>
+                <strong style="color:var(--chalk-cyan);">Nitrogen</strong>
+                <div style="font-size:0.75rem; color:var(--chalk-muted);">The Genetic Architect</div>
+              </div>
+            </div>
+            <div class="element-pill">
+              <div class="pill-symbol sym-o">O</div>
+              <div>
+                <strong style="color:var(--chalk-amber);">Oxygen</strong>
+                <div style="font-size:0.75rem; color:var(--chalk-muted);">The Energy Catalyst</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <span style="font-size:0.88rem; color:var(--chalk-muted);">Slide 1 of 9</span>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(2)">
+            Next: Foundation Principle &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: Foundation Principle -->
+      <section class="slide" id="slide-2" data-slide="2">
+        <div>
+          <div class="slide-tag tag-title">Foundation Principle</div>
+          <h2 class="slide-title">Matter Cycles, Energy Flows</h2>
+          <p class="slide-subtitle">
+            Unlike sunlight energy that radiates away as heat, every single atom of carbon, nitrogen, and oxygen on Earth today has been recycled for roughly 4.5 billion years.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--chalk-green);">⚛️</div>
+            <h3 class="card-title">Closed Chemical System</h3>
+            <p class="card-desc">
+              Earth receives almost zero new matter from space. Every protein, DNA strand, and molecule in your body was once inside ancient rocks, oceans, or primordial organisms.
+            </p>
+            <div class="chem-formula">Conservation of Mass: Σ m(reactants) = Σ m(products)</div>
+          </div>
+
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--chalk-cyan);">🔄</div>
+            <h3 class="card-title">Reservoirs & Fluxes</h3>
+            <p class="card-desc">
+              <strong>Reservoirs (Sinks):</strong> Places where elements are stored (atmosphere, oceans, deep rocks, soil).<br><br>
+              <strong>Fluxes:</strong> The biological and physical processes moving elements between reservoirs.
+            </p>
+            <div class="chem-formula">Flux Rate = Mass / Time</div>
+          </div>
+
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(251, 146, 60, 0.15); color: var(--chalk-amber);">⚡</div>
+            <h3 class="card-title">Interconnected Web</h3>
+            <p class="card-desc">
+              These three cycles never act alone. Photosynthesis links Carbon with Oxygen. Protein synthesis requires both Carbon and Nitrogen. Perturbing one disrupts all three.
+            </p>
+            <div class="chem-formula">Redfield Ratio: 106 C : 16 N : 1 P</div>
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(1)">
+            &larr; Back to Slide 1
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(3)">
+            Next: The Carbon Cycle &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: Carbon Cycle -->
+      <section class="slide" id="slide-3" data-slide="3">
+        <div>
+          <div class="slide-tag tag-carbon">Element #6 • Carbon [C]</div>
+          <h2 class="slide-title">The Carbon Cycle: The Currency of Life</h2>
+          <p class="slide-subtitle">
+            Carbon forms 4 covalent bonds, allowing complex organic chemistry. Its cycle operates across two vastly different timescales: the fast biological loop and the slow geological loop.
+          </p>
+        </div>
+
+        <div class="split-box">
+          <div class="split-col accent-green">
+            <h3 style="font-family: var(--font-hand); font-size:1.6rem; color:var(--chalk-green); margin-bottom:8px;">
+              The Fast Biological Loop (Days to Decades)
+            </h3>
+            <p style="font-size:0.88rem; color:var(--chalk-muted); margin-bottom:12px;">
+              Driven entirely by biological metabolism between the atmosphere and organisms.
+            </p>
+            <ul class="bullet-list">
+              <li>
+                <div>
+                  <strong>Photosynthesis:</strong> Plants and phytoplankton pull CO₂ from air/water to build glucose.
+                  <div class="chem-formula">6CO₂ + 6H₂O + hv → C₆H₁₂O₆ + 6O₂</div>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <strong>Cellular Respiration:</strong> Animals, fungi, and microbes combust glucose to release energy and return CO₂.
+                  <div class="chem-formula">C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="split-col accent-green">
+            <h3 style="font-family: var(--font-hand); font-size:1.6rem; color:var(--chalk-yellow); margin-bottom:8px;">
+              The Slow Geological Loop (Millions of Years)
+            </h3>
+            <p style="font-size:0.88rem; color:var(--chalk-muted); margin-bottom:12px;">
+              Regulates Earth's long-term climate thermostat via the lithosphere and deep oceans.
+            </p>
+            <ul class="bullet-list">
+              <li>
+                <div>
+                  <strong>Ocean Sinks & Limestone:</strong> Dissolved CO₂ forms CaCO₃ shells that compress on the seafloor into limestone rock.
+                </div>
+              </li>
+              <li>
+                <div>
+                  <strong>Fossil Fuel Traps:</strong> Ancient organic biomass buried under intense heat and pressure becomes coal, oil, and gas.
+                </div>
+              </li>
+              <li>
+                <div>
+                  <strong>Volcanic Return:</strong> Subducted rocks melt and release CO₂ through eruptions.
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(2)">
+            &larr; Back to Slide 2
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(4)">
+            Next: The Nitrogen Cycle &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: Nitrogen Cycle -->
+      <section class="slide" id="slide-4" data-slide="4">
+        <div>
+          <div class="slide-tag tag-nitrogen">Element #7 • Nitrogen [N]</div>
+          <h2 class="slide-title">The Nitrogen Cycle: The Locked Vault</h2>
+          <p class="slide-subtitle">
+            Although N₂ gas makes up 78% of our atmosphere, plants and animals cannot breathe it in. The triple bond (N≡N) is chemically inert and requires biological fixation.
+          </p>
+        </div>
+
+        <div class="flow-pipeline">
+          <div class="flow-step">
+            <div class="flow-num">01</div>
+            <h4>Fixation</h4>
+            <p><strong>N₂ → NH₃ / NH₄⁺</strong></p>
+            <p style="margin-top:6px;">
+              Rhizobium bacteria in legume root nodules & lightning break the triple bond into bioavailable ammonium.
+            </p>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-num">02</div>
+            <h4>Nitrification</h4>
+            <p><strong>NH₄⁺ → NO₂⁻ → NO₃⁻</strong></p>
+            <p style="margin-top:6px;">
+              Soil bacteria (<em>Nitrosomonas</em> & <em>Nitrobacter</em>) oxidize ammonium into nitrite, then usable nitrates.
+            </p>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-num">03</div>
+            <h4>Assimilation</h4>
+            <p><strong>NO₃⁻ → Biomass</strong></p>
+            <p style="margin-top:6px;">
+              Plant roots absorb nitrates to build essential amino acids, proteins, and RNA/DNA nucleotides.
+            </p>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-num">04</div>
+            <h4>Ammonification</h4>
+            <p><strong>Waste → NH₄⁺</strong></p>
+            <p style="margin-top:6px;">
+              Fungal and bacterial decomposers convert dead tissues, feces, and urea back into ammonium.
+            </p>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-num">05</div>
+            <h4>Denitrification</h4>
+            <p><strong>NO₃⁻ → N₂ Gas</strong></p>
+            <p style="margin-top:6px;">
+              Anaerobic bacteria in wetlands and sediments convert nitrates back into inert atmospheric N₂ gas.
+            </p>
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(3)">
+            &larr; Back to Slide 3
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(5)">
+            Next: The Oxygen Cycle &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: Oxygen Cycle -->
+      <section class="slide" id="slide-5" data-slide="5">
+        <div>
+          <div class="slide-tag tag-oxygen">Element #8 • Oxygen [O]</div>
+          <h2 class="slide-title">The Oxygen Cycle: Breath & Shield</h2>
+          <p class="slide-subtitle">
+            Oxygen constitutes 21% of the atmosphere and drives aerobic cellular respiration, but its largest reservoir is locked inside Earth's rocky crust.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(251, 146, 60, 0.15); color: var(--chalk-amber);">🌊</div>
+            <h3 class="card-title">Phytoplankton & Ocean</h3>
+            <p class="card-desc">
+              Over <strong>50% to 70%</strong> of Earth’s atmospheric oxygen is produced not by rainforests, but by microscopic oceanic cyanobacteria and diatoms (e.g. <em>Prochlorococcus</em>).
+            </p>
+            <div class="chem-formula">Photolysis: 2H₂O + light → 4H⁺ + 4e⁻ + O₂</div>
+          </div>
+
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--chalk-cyan);">🛡️</div>
+            <h3 class="card-title">The Ozone Shield (O₃)</h3>
+            <p class="card-desc">
+              High in the stratosphere, UV radiation splits O₂ into free radicals that combine to form ozone (O₃), shielding life from lethal mutagenic UV radiation.
+            </p>
+            <div class="chem-formula">Chapman Cycle: O₂ + O → O₃</div>
+          </div>
+
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(252, 211, 77, 0.15); color: var(--chalk-yellow);">⛰️</div>
+            <h3 class="card-title">The Lithosphere Sink</h3>
+            <p class="card-desc">
+              Over <strong>99.5%</strong> of all oxygen atoms on Earth are chemically bonded inside silicate minerals, quartz (SiO₂), and iron oxides (Fe₂O₃) in the crust and mantle!
+            </p>
+            <div class="chem-formula">Mineral Sink: 4Fe + 3O₂ → 2Fe₂O₃ (Rust)</div>
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(4)">
+            &larr; Back to Slide 4
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(6)">
+            Next: Grand Nexus &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: Grand Nexus -->
+      <section class="slide" id="slide-6" data-slide="6">
+        <div>
+          <div class="slide-tag tag-nexus">Molecular Synergy</div>
+          <h2 class="slide-title">The Grand Nexus: How All Three Meet</h2>
+          <p class="slide-subtitle">
+            These elements do not cycle on isolated tracks. They intersect directly at the cellular and planetary levels.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="content-card" style="border-top: 3px solid var(--chalk-green);">
+            <h3 class="card-title" style="color:var(--chalk-green);">Carbon ↔ Oxygen</h3>
+            <p class="card-desc">
+              The direct reciprocal engine. Plant photosynthesis absorbs CO₂ and generates O₂; animal and microbial respiration consumes O₂ and emits CO₂.
+            </p>
+            <div class="chem-formula">Photosynthesis ⇌ Respiration</div>
+          </div>
+
+          <div class="content-card" style="border-top: 3px solid var(--chalk-cyan);">
+            <h3 class="card-title" style="color:var(--chalk-cyan);">Carbon ↔ Nitrogen</h3>
+            <p class="card-desc">
+              Regulated by the <strong>C:N stoichiometry</strong>. Plants cannot utilize extra carbon without fixed nitrogen to assemble RuBisCO (the most abundant enzyme on Earth).
+            </p>
+            <div class="chem-formula">RuBisCO Enzyme = Carbon + Nitrogen</div>
+          </div>
+
+          <div class="content-card" style="border-top: 3px solid var(--chalk-amber);">
+            <h3 class="card-title" style="color:var(--chalk-amber);">Nitrogen ↔ Oxygen</h3>
+            <p class="card-desc">
+              Nitrification strictly requires dissolved oxygen. In oxygen-deprived (hypoxic) dead zones, denitrifying bacteria thrive, consuming nitrates and releasing nitrous oxide (N₂O).
+            </p>
+            <div class="chem-formula">NH₄⁺ + 2O₂ → NO₃⁻ + H₂O + 2H⁺</div>
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(5)">
+            &larr; Back to Slide 5
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(7)">
+            Next: Human Disruption &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: Anthropogenic Impact -->
+      <section class="slide" id="slide-7" data-slide="7">
+        <div>
+          <div class="slide-tag tag-title" style="border-color:#ef4444; color:#ef4444; background:rgba(239, 68, 68, 0.1);">Human Disruption</div>
+          <h2 class="slide-title">Human Disruption & Planetary Boundaries</h2>
+          <p class="slide-subtitle">
+            Industrial civilization has drastically accelerated natural fluxes, destabilizing the equilibrium that took millions of years to establish.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">🏭</div>
+            <h3 class="card-title">Carbon Overload</h3>
+            <p class="card-desc">
+              Combusting fossil fuels unlocks ancient millions-year-old carbon reservoirs in seconds, pushing atmospheric CO₂ past 420 ppm and driving ocean acidification.
+            </p>
+          </div>
+
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--chalk-cyan);">🌾</div>
+            <h3 class="card-title">Haber-Bosch Nitrogen</h3>
+            <p class="card-desc">
+              Synthetic industrial fertilizer fixed more nitrogen than all natural biology combined. Agricultural runoff causes massive algal blooms and catastrophic aquatic dead zones.
+            </p>
+          </div>
+
+          <div class="content-card">
+            <div class="card-icon" style="background: rgba(251, 146, 60, 0.15); color: var(--chalk-amber);">⚠️</div>
+            <h3 class="card-title">Ocean Deoxygenation</h3>
+            <p class="card-desc">
+              Warming ocean waters hold less dissolved oxygen. Dying algal blooms decompose via aerobic bacteria, draining oxygen and creating suffocation zones for marine life.
+            </p>
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(6)">
+            &larr; Back to Slide 6
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(8)">
+            Next: Summary & Takeaways &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: Summary Takeaways -->
+      <section class="slide" id="slide-8" data-slide="8">
+        <div>
+          <div class="slide-tag tag-title">Final Wrap-up</div>
+          <h2 class="slide-title">Summary & Core Takeaways</h2>
+          <p class="slide-subtitle">
+            Everything in Earth's chemistry is recycled. Remember these key points for exams and discussions:
+          </p>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:12px;">
+          <div class="takeaway-card">
+            <div class="takeaway-num">01. Carbon</div>
+            <p style="font-size:0.9rem; color:#e2e8f0; line-height:1.5;">
+              Cycles between organic sugars and greenhouse gases. Regulated quickly by living bodies and slowly by ocean limestone rocks.
+            </p>
+          </div>
+
+          <div class="takeaway-card">
+            <div class="takeaway-num">02. Nitrogen</div>
+            <p style="font-size:0.9rem; color:#e2e8f0; line-height:1.5;">
+              78% of air, but chemically locked. Entirely dependent on bacterial fixation (<em>Rhizobium</em>) and nitrification to feed life.
+            </p>
+          </div>
+
+          <div class="takeaway-card">
+            <div class="takeaway-num">03. Oxygen</div>
+            <p style="font-size:0.9rem; color:#e2e8f0; line-height:1.5;">
+              Created largely by ocean phytoplankton. Drives metabolism, shields Earth via stratosphere ozone (O₃), and rests in crust minerals.
+            </p>
+          </div>
+        </div>
+
+        <div style="background: rgba(252, 211, 77, 0.08); border: 1px dashed var(--chalk-yellow); border-radius: 12px; padding: 16px; text-align: center;">
+          <p style="font-family: var(--font-hand); font-size: 1.35rem; color: var(--chalk-yellow);">
+            "In nature, nothing is created, nothing is lost, everything is transformed." — Antoine Lavoisier
+          </p>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(7)">
+            &larr; Back to Slide 7
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(9)">
+            Next: Credits & Questions &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: Credits & Q&A -->
+      <section class="slide" id="slide-9" data-slide="9">
+        <div>
+          <div class="slide-tag tag-title">Conclusion & Credits</div>
+          <h2 class="slide-title">Thank You for Listening!</h2>
+          <p class="slide-subtitle">
+            We appreciate your attention and engagement throughout our presentation on Earth's essential cycles.
+          </p>
+        </div>
+
+        <div class="grid-2">
+          <!-- Presenters -->
+          <div class="content-card" style="border-top: 3px solid var(--chalk-green);">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--chalk-green); margin-bottom:0;">🎓</div>
+              <div>
+                <h3 class="card-title" style="margin-bottom:2px; font-size:1.5rem; color:var(--chalk-green);">Created & Presented By</h3>
+                <span style="font-size:0.75rem; color:var(--chalk-muted); font-family:var(--font-code);">Project Contributors</span>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-size: 1.2rem; font-weight: 700; color: #fff;">Lojain Mashhour</div>
+                  <div style="font-size: 0.82rem; color: var(--chalk-muted);">Research & Chemical Dynamics</div>
+                </div>
+                <span class="slide-counter" style="color:var(--chalk-cyan);">Presenter</span>
+              </div>
+
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-size: 1.2rem; font-weight: 700; color: #fff;">Jowairea Hany</div>
+                  <div style="font-size: 0.82rem; color: var(--chalk-muted);">Research & Systems Synthesis</div>
+                </div>
+                <span class="slide-counter" style="color:var(--chalk-green);">Presenter</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teacher Guidance -->
+          <div class="content-card" style="border-top: 3px solid var(--chalk-yellow);">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div class="card-icon" style="background: rgba(252, 211, 77, 0.15); color: var(--chalk-yellow); margin-bottom:0;">🔬</div>
+              <div>
+                <h3 class="card-title" style="margin-bottom:2px; font-size:1.5rem; color:var(--chalk-yellow);">Under the Guidance Of</h3>
+                <span style="font-size:0.75rem; color:var(--chalk-muted); font-family:var(--font-code);">Faculty Supervision</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 10px; background: rgba(252, 211, 77, 0.04); border: 1px dashed rgba(252, 211, 77, 0.25); border-radius: 10px; padding: 14px 18px;">
+              <div style="font-size: 1.35rem; font-weight: 800; color: var(--chalk-yellow); margin-bottom: 2px;">
+                Miss. Rawaan
+              </div>
+              <div style="font-size: 0.9rem; color: #e2e8f0; font-weight: 600; margin-bottom: 8px;">
+                Biology Teacher & Academic Mentor
+              </div>
+              <p style="font-size: 0.83rem; color: var(--chalk-muted); line-height: 1.5;">
+                With sincere gratitude for your guidance, encouragement, and support throughout our exploration of biological science.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed var(--chalk-cyan); border-radius: 12px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 1.4rem;">💬</span>
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 1rem;">Questions & Discussion</div>
+              <div style="font-size: 0.8rem; color: var(--chalk-muted);">Any questions regarding Carbon, Nitrogen, or Oxygen cycles?</div>
+            </div>
+          </div>
+          <div style="font-family: var(--font-hand); font-size: 1.15rem; color: var(--chalk-yellow);">
+            The floor is open! ✨
+          </div>
+        </div>
+
+        <div class="slide-direct-nav">
+          <button type="button" class="slide-nav-btn" onclick="goToSlide(8)">
+            &larr; Back to Slide 8
+          </button>
+          <button type="button" class="slide-nav-btn next-accent" onclick="goToSlide(1)">
+            &#8634; Back to Start (Slide 1)
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script>
+    (function() {
+      window.currentSlide = 1;
+      window.totalSlides = 9;
+      window.isScrollMode = false;
+
+      const slideCounter = document.getElementById('slideCounter');
+      const progressBar = document.getElementById('progressBar');
+      const modeToggleBtn = document.getElementById('modeToggleBtn');
+      const modeIcon = document.getElementById('modeIcon');
+      const modeText = document.getElementById('modeText');
+      const jumpButtons = document.querySelectorAll('.jump-btn');
+
+      // MASTER FUNCTION TO GO TO ANY SLIDE (1-9)
+      window.goToSlide = function(targetNumber) {
+        if (targetNumber < 1 || targetNumber > window.totalSlides) return;
+        window.currentSlide = targetNumber;
+
+        for (let i = 1; i <= window.totalSlides; i++) {
+          const slideEl = document.getElementById('slide-' + i);
+          if (slideEl) {
+            if (window.isScrollMode) {
+              slideEl.style.display = 'flex';
+            } else {
+              if (i === window.currentSlide) {
+                slideEl.style.display = 'flex';
+                slideEl.classList.add('active');
+              } else {
+                slideEl.style.display = 'none';
+                slideEl.classList.remove('active');
+              }
+            }
+          }
+        }
+
+        // Update Counter & Progress Bar
+        slideCounter.textContent = 'Slide ' + window.currentSlide + ' of ' + window.totalSlides;
+        progressBar.style.width = ((window.currentSlide / window.totalSlides) * 100) + '%';
+
+        // Update Jump Buttons
+        jumpButtons.forEach((btn, idx) => {
+          btn.classList.toggle('active', (idx + 1) === window.currentSlide);
+        });
+
+        // In Scroll mode: smoothly scroll to element
+        if (window.isScrollMode) {
+          const target = document.getElementById('slide-' + window.currentSlide);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else {
+          // In Slide show mode: jump to top so full slide is visible
+          window.scrollTo(0, 0);
+        }
+      };
+
+      // MODE SWITCHER (Slideshow vs Scroll Feed)
+      window.toggleViewMode = function() {
+        window.isScrollMode = !window.isScrollMode;
+        if (window.isScrollMode) {
+          document.body.classList.add('view-scroll-mode');
+          modeIcon.textContent = '🎬';
+          modeText.textContent = 'Slide Show';
+          // Make all slides visible
+          for (let i = 1; i <= window.totalSlides; i++) {
+            const slideEl = document.getElementById('slide-' + i);
+            if (slideEl) slideEl.style.display = 'flex';
+          }
+          const target = document.getElementById('slide-' + window.currentSlide);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          document.body.classList.remove('view-scroll-mode');
+          modeIcon.textContent = '📜';
+          modeText.textContent = 'Scroll View';
+          window.goToSlide(window.currentSlide);
+        }
+      };
+
+      window.toggleFullscreen = function() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(err => console.log(err));
+        } else {
+          document.exitFullscreen().catch(err => console.log(err));
+        }
+      };
+
+      // Keyboard Arrow Navigation
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+          e.preventDefault();
+          window.goToSlide(window.currentSlide + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          e.preventDefault();
+          window.goToSlide(window.currentSlide - 1);
+        } else if (e.key.toLowerCase() === 'f') {
+          window.toggleFullscreen();
+        }
+      });
+
+      // Touch / Swipe Navigation for Slide Show
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+
+      document.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          touchStartTime = Date.now();
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchend', (e) => {
+        if (window.isScrollMode) return;
+
+        if (e.changedTouches.length === 1) {
+          const deltaX = e.changedTouches[0].clientX - touchStartX;
+          const deltaY = e.changedTouches[0].clientY - touchStartY;
+          const elapsed = Date.now() - touchStartTime;
+
+          if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2 && elapsed < 700) {
+            if (deltaX < 0) {
+              window.goToSlide(window.currentSlide + 1);
+            } else {
+              window.goToSlide(window.currentSlide - 1);
+            }
+          }
+        }
+      }, { passive: true });
+
+      // Start on Slide 1
+      window.goToSlide(1);
+    })();
+  </script>
+</body>
+</html>
