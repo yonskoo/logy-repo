@@ -442,38 +442,96 @@
 
     .element-pills {
       display: flex;
-      gap: 14px;
-      margin: 20px 0 24px;
+      gap: 20px;
+      margin: 24px 0 28px;
       flex-wrap: wrap;
       justify-content: center;
     }
 
-    .element-pill {
+    /* Authentic Periodic Table Element Tile */
+    .pt-tile {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 50px;
-      padding: 8px 20px;
-    }
-
-    .pill-symbol {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-code);
-      font-weight: 700;
-      font-size: 0.95rem;
-      flex-shrink: 0;
+      width: 100px;
+      height: 110px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 8px 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .sym-c { background: rgba(74, 222, 128, 0.2); color: var(--chalk-green); border: 1px solid var(--chalk-green); }
-    .sym-n { background: rgba(56, 189, 248, 0.2); color: var(--chalk-cyan); border: 1px solid var(--chalk-cyan); }
-    .sym-o { background: rgba(251, 146, 60, 0.2); color: var(--chalk-amber); border: 1px solid var(--chalk-amber); }
+    .pt-tile:hover {
+      transform: translateY(-4px);
+    }
+
+    .pt-tile-carbon {
+      border: 2px solid var(--chalk-green);
+      box-shadow: 0 0 16px rgba(74, 222, 128, 0.18);
+    }
+
+    .pt-tile-nitrogen {
+      border: 2px solid var(--chalk-cyan);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.18);
+    }
+
+    .pt-tile-oxygen {
+      border: 2px solid var(--chalk-amber);
+      box-shadow: 0 0 16px rgba(251, 146, 60, 0.18);
+    }
+
+    .pt-number {
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--chalk-muted);
+      align-self: flex-start;
+      line-height: 1;
+    }
+
+    .pt-symbol {
+      font-family: var(--font-body);
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin: 2px 0 3px;
+    }
+
+    .pt-name {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+
+    .pt-mass {
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      color: var(--chalk-muted);
+      margin-top: 3px;
+      line-height: 1;
+    }
+
+    /* Inline periodic badge for slide headers */
+    .pt-badge-inline {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 54px;
+      height: 58px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+      margin-right: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
 
     .takeaway-card {
       background: rgba(255, 255, 255, 0.035);
@@ -612,26 +670,26 @@
           </p>
 
           <div class="element-pills">
-            <div class="element-pill">
-              <div class="pill-symbol sym-c">C</div>
-              <div>
-                <strong style="color:var(--chalk-green);">Carbon</strong>
-                <div style="font-size:0.75rem; color:var(--chalk-muted);">The Molecular Backbone</div>
-              </div>
+            <!-- Carbon Tile -->
+            <div class="pt-tile pt-tile-carbon">
+              <span class="pt-number">6</span>
+              <span class="pt-symbol" style="color:var(--chalk-green);">C</span>
+              <span class="pt-name">Carbon</span>
+              <span class="pt-mass">12.011</span>
             </div>
-            <div class="element-pill">
-              <div class="pill-symbol sym-n">N</div>
-              <div>
-                <strong style="color:var(--chalk-cyan);">Nitrogen</strong>
-                <div style="font-size:0.75rem; color:var(--chalk-muted);">The Genetic Architect</div>
-              </div>
+            <!-- Nitrogen Tile -->
+            <div class="pt-tile pt-tile-nitrogen">
+              <span class="pt-number">7</span>
+              <span class="pt-symbol" style="color:var(--chalk-cyan);">N</span>
+              <span class="pt-name">Nitrogen</span>
+              <span class="pt-mass">14.007</span>
             </div>
-            <div class="element-pill">
-              <div class="pill-symbol sym-o">O</div>
-              <div>
-                <strong style="color:var(--chalk-amber);">Oxygen</strong>
-                <div style="font-size:0.75rem; color:var(--chalk-muted);">The Energy Catalyst</div>
-              </div>
+            <!-- Oxygen Tile -->
+            <div class="pt-tile pt-tile-oxygen">
+              <span class="pt-number">8</span>
+              <span class="pt-symbol" style="color:var(--chalk-amber);">O</span>
+              <span class="pt-name">Oxygen</span>
+              <span class="pt-mass">15.999</span>
             </div>
           </div>
         </div>
@@ -696,12 +754,20 @@
 
       <!-- SLIDE 3: Carbon Cycle -->
       <section class="slide" id="slide-3" data-slide="3">
-        <div>
-          <div class="slide-tag tag-carbon">Element #6 • Carbon [C]</div>
-          <h2 class="slide-title">The Carbon Cycle: The Currency of Life</h2>
-          <p class="slide-subtitle">
-            Carbon forms 4 covalent bonds, allowing complex organic chemistry. Its cycle operates across two vastly different timescales: the fast biological loop and the slow geological loop.
-          </p>
+        <div style="display:flex; align-items:flex-start; gap:16px;">
+          <div class="pt-tile pt-tile-carbon" style="width:78px; height:86px; flex-shrink:0;">
+            <span class="pt-number" style="font-size:0.7rem;">6</span>
+            <span class="pt-symbol" style="color:var(--chalk-green); font-size:1.6rem; margin:1px 0;">C</span>
+            <span class="pt-name" style="font-size:0.65rem;">Carbon</span>
+            <span class="pt-mass" style="font-size:0.6rem;">12.011</span>
+          </div>
+          <div>
+            <div class="slide-tag tag-carbon">Element #6 • Carbon [C]</div>
+            <h2 class="slide-title" style="margin-top:2px;">The Carbon Cycle: The Currency of Life</h2>
+            <p class="slide-subtitle">
+              Carbon forms 4 covalent bonds, allowing complex organic chemistry. Its cycle operates across two vastly different timescales: the fast biological loop and the slow geological loop.
+            </p>
+          </div>
         </div>
 
         <div class="split-box">
@@ -767,12 +833,20 @@
 
       <!-- SLIDE 4: Nitrogen Cycle -->
       <section class="slide" id="slide-4" data-slide="4">
-        <div>
-          <div class="slide-tag tag-nitrogen">Element #7 • Nitrogen [N]</div>
-          <h2 class="slide-title">The Nitrogen Cycle: The Locked Vault</h2>
-          <p class="slide-subtitle">
-            Although N₂ gas makes up 78% of our atmosphere, plants and animals cannot breathe it in. The triple bond (N≡N) is chemically inert and requires biological fixation.
-          </p>
+        <div style="display:flex; align-items:flex-start; gap:16px;">
+          <div class="pt-tile pt-tile-nitrogen" style="width:78px; height:86px; flex-shrink:0;">
+            <span class="pt-number" style="font-size:0.7rem;">7</span>
+            <span class="pt-symbol" style="color:var(--chalk-cyan); font-size:1.6rem; margin:1px 0;">N</span>
+            <span class="pt-name" style="font-size:0.65rem;">Nitrogen</span>
+            <span class="pt-mass" style="font-size:0.6rem;">14.007</span>
+          </div>
+          <div>
+            <div class="slide-tag tag-nitrogen">Element #7 • Nitrogen [N]</div>
+            <h2 class="slide-title" style="margin-top:2px;">The Nitrogen Cycle: The Locked Vault</h2>
+            <p class="slide-subtitle">
+              Although N₂ gas makes up 78% of our atmosphere, plants and animals cannot breathe it in. The triple bond (N≡N) is chemically inert and requires biological fixation.
+            </p>
+          </div>
         </div>
 
         <div class="flow-pipeline">
@@ -834,12 +908,20 @@
 
       <!-- SLIDE 5: Oxygen Cycle -->
       <section class="slide" id="slide-5" data-slide="5">
-        <div>
-          <div class="slide-tag tag-oxygen">Element #8 • Oxygen [O]</div>
-          <h2 class="slide-title">The Oxygen Cycle: Breath & Shield</h2>
-          <p class="slide-subtitle">
-            Oxygen constitutes 21% of the atmosphere and drives aerobic cellular respiration, but its largest reservoir is locked inside Earth's rocky crust.
-          </p>
+        <div style="display:flex; align-items:flex-start; gap:16px;">
+          <div class="pt-tile pt-tile-oxygen" style="width:78px; height:86px; flex-shrink:0;">
+            <span class="pt-number" style="font-size:0.7rem;">8</span>
+            <span class="pt-symbol" style="color:var(--chalk-amber); font-size:1.6rem; margin:1px 0;">O</span>
+            <span class="pt-name" style="font-size:0.65rem;">Oxygen</span>
+            <span class="pt-mass" style="font-size:0.6rem;">15.999</span>
+          </div>
+          <div>
+            <div class="slide-tag tag-oxygen">Element #8 • Oxygen [O]</div>
+            <h2 class="slide-title" style="margin-top:2px;">The Oxygen Cycle: Breath & Shield</h2>
+            <p class="slide-subtitle">
+              Oxygen constitutes 21% of the atmosphere and drives aerobic cellular respiration, but its largest reservoir is locked inside Earth's rocky crust.
+            </p>
+          </div>
         </div>
 
         <div class="grid-3">
@@ -1035,40 +1117,36 @@
         <div class="grid-2">
           <!-- Presenters -->
           <div class="content-card" style="border-top: 3px solid var(--chalk-green);">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-              <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--chalk-green); margin-bottom:0;">🎓</div>
-              <div>
-                <h3 class="card-title" style="margin-bottom:2px; font-size:1.5rem; color:var(--chalk-green);">Created & Presented By</h3>
-                <span style="font-size:0.75rem; color:var(--chalk-muted); font-family:var(--font-code);">Project Contributors</span>
-              </div>
-            </div>
-
-          <!-- Presenter Info -->
-          <div class="content-card" style="border-top: 3px solid var(--chalk-green);">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
               <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--chalk-green); margin-bottom:0;">👤</div>
               <div>
-                <h3 class="card-title" style="margin-bottom:2px; font-size:1.5rem; color:var(--chalk-green);">Biology Presenter</h3>
-                <span style="font-size:0.75rem; color:var(--chalk-muted); font-family:var(--font-code);">Student Presentation</span>
+                <h3 class="card-title" style="margin-bottom:2px; font-size:1.5rem; color:var(--chalk-green);">Biology Presenters</h3>
+                <span style="font-size:0.75rem; color:var(--chalk-muted); font-family:var(--font-code);">Presented by</span>
               </div>
             </div>
 
-            <div style="margin-top: 10px; background: rgba(74, 222, 128, 0.04); border: 1px dashed rgba(74, 222, 128, 0.25); border-radius: 10px; padding: 14px 18px;">
-              <div style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 2px;">
-                Logy (Lojain Mashhour)
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">Logy (Lojain Mashhour)</div>
+                  <div style="font-size: 0.85rem; color: var(--chalk-green);">Biology Presenter</div>
+                </div>
+                <span class="slide-counter" style="color:var(--chalk-green);">Presenter</span>
               </div>
-              <div style="font-size: 0.9rem; color: var(--chalk-green); font-weight: 600; margin-bottom: 8px;">
-                Biology Presenter
+
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">Jowairea Hany</div>
+                  <div style="font-size: 0.85rem; color: var(--chalk-cyan);">Biology Presenter</div>
+                </div>
+                <span class="slide-counter" style="color:var(--chalk-cyan);">Presenter</span>
               </div>
-              <p style="font-size: 0.85rem; color: var(--chalk-muted); line-height: 1.5;">
-                Thank you for listening to this presentation on Carbon, Nitrogen, and Oxygen cycles!
-              </p>
             </div>
           </div>
 
           <!-- Teacher Guidance -->
           <div class="content-card" style="border-top: 3px solid var(--chalk-yellow);">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
               <div class="card-icon" style="background: rgba(252, 211, 77, 0.15); color: var(--chalk-yellow); margin-bottom:0;">🔬</div>
               <div>
                 <h3 class="card-title" style="margin-bottom:2px; font-size:1.5rem; color:var(--chalk-yellow);">Biology Teacher</h3>
@@ -1076,14 +1154,14 @@
               </div>
             </div>
 
-            <div style="margin-top: 10px; background: rgba(252, 211, 77, 0.04); border: 1px dashed rgba(252, 211, 77, 0.25); border-radius: 10px; padding: 14px 18px;">
-              <div style="font-size: 1.35rem; font-weight: 800; color: var(--chalk-yellow); margin-bottom: 2px;">
+            <div style="background: rgba(252, 211, 77, 0.04); border: 1px dashed rgba(252, 211, 77, 0.25); border-radius: 10px; padding: 16px 20px;">
+              <div style="font-size: 1.35rem; font-weight: 800; color: var(--chalk-yellow); margin-bottom: 4px;">
                 Miss. Rawaan
               </div>
-              <div style="font-size: 0.9rem; color: #e2e8f0; font-weight: 600; margin-bottom: 8px;">
+              <div style="font-size: 0.92rem; color: #e2e8f0; font-weight: 600; margin-bottom: 10px;">
                 Biology Teacher
               </div>
-              <p style="font-size: 0.85rem; color: var(--chalk-muted); line-height: 1.5;">
+              <p style="font-size: 0.85rem; color: var(--chalk-muted); line-height: 1.55;">
                 Special thanks to Miss. Rawaan for her guidance and support in our biology lessons.
               </p>
             </div>
